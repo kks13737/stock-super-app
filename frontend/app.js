@@ -1,4 +1,4 @@
-const state = {
+﻿const state = {
   health: null,
   tradeJournals: [],
   news: [],
@@ -22,10 +22,15 @@ const API_BASE_URL =
   window.__API_BASE_URL__ ||
   "";
 const IS_GITHUB_PAGES = window.location.hostname.endsWith("github.io");
+const HAS_BACKEND = Boolean(API_BASE_URL);
 
 async function request(path, options = {}) {
-  if (IS_GITHUB_PAGES && !API_BASE_URL) {
-    throw new Error("GitHub Pages 배포에서는 백엔드 API가 연결되지 않았습니다.");
+  if (!HAS_BACKEND) {
+    const method = String(options.method || "GET").toUpperCase();
+    if (method === "GET") {
+      return offlineResponse(path);
+    }
+    throw new Error("백엔드 연결이 아직 설정되지 않았습니다.");
   }
 
   const url = API_BASE_URL ? `${API_BASE_URL}${path}` : path;
@@ -52,6 +57,31 @@ async function request(path, options = {}) {
   }
 
   return payload;
+}
+
+function offlineResponse(path) {
+  if (path.startsWith("/api/health")) {
+    return {
+      api: { status: "unavailable", service: "backend" },
+      database: { status: "unavailable", service: "database", connected: false },
+      overall: "offline",
+      message: "백엔드 연결이 아직 설정되지 않았습니다.",
+    };
+  }
+
+  if (path.startsWith("/api/trade-journals")) {
+    return { items: [] };
+  }
+
+  if (path.startsWith("/api/news")) {
+    return { items: [] };
+  }
+
+  if (path.startsWith("/api/fear-greed")) {
+    return { items: [] };
+  }
+
+  return {};
 }
 
 function formatDateTime(value) {
@@ -314,6 +344,11 @@ async function loadFearGreed() {
 async function handleTradeSubmit(event) {
   event.preventDefault();
 
+  if (!HAS_BACKEND) {
+    $("#trade-form-message").textContent = "백엔드 연결이 아직 설정되지 않았습니다.";
+    return;
+  }
+
   const payload = {
     trade_date: $("#trade-date").value,
     ticker: $("#trade-ticker").value.trim(),
@@ -343,6 +378,11 @@ async function handleTradeSubmit(event) {
 }
 
 async function syncNews() {
+  if (!HAS_BACKEND) {
+    $("#news-message").textContent = "백엔드 연결이 아직 설정되지 않았습니다.";
+    return;
+  }
+
   $("#news-message").textContent = "수집 중...";
   try {
     const result = await request(endpoints.newsSync, { method: "POST" });
@@ -354,6 +394,11 @@ async function syncNews() {
 }
 
 async function syncFearGreed() {
+  if (!HAS_BACKEND) {
+    $("#fg-message").textContent = "백엔드 연결이 아직 설정되지 않았습니다.";
+    return;
+  }
+
   $("#fg-message").textContent = "수집 중...";
   try {
     const result = await request(endpoints.fearGreedSync, { method: "POST" });
@@ -406,3 +451,4 @@ async function bootstrap() {
 }
 
 document.addEventListener("DOMContentLoaded", bootstrap);
+
