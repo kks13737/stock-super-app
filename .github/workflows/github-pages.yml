@@ -1,0 +1,70 @@
+name: GitHub Pages Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare Pages content
+        env:
+          BACKEND_API_BASE_URL: ${{ vars.BACKEND_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BACKEND_API_BASE_URL:-}" ]; then
+            echo "BACKEND_API_BASE_URL GitHub Actions variable is required for GitHub Pages deployment."
+            exit 1
+          fi
+
+          rm -rf dist-pages
+          mkdir -p dist-pages
+          cp frontend/index.html dist-pages/index.html
+          cp frontend/styles.css dist-pages/styles.css
+          cp frontend/app.js dist-pages/app.js
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          from html import escape
+
+          backend_url = os.environ.get("BACKEND_API_BASE_URL", "").strip()
+          if not backend_url:
+              raise SystemExit("BACKEND_API_BASE_URL is required")
+
+          index_path = Path("dist-pages/index.html")
+          content = index_path.read_text(encoding="utf-8")
+          replacement = f'<meta name="api-base" content="{escape(backend_url, quote=True)}" />'
+          content = content.replace('<meta name="api-base" content="" />', replacement)
+          index_path.write_text(content, encoding="utf-8")
+          PY
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist-pages
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -25,6 +25,24 @@ uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 start http://127.0.0.1:8000
 ```
 
+### 1.3 Cloudflare Tunnel
+- `cloudflared`가 설치되어 있어야 한다.
+- 설치 후 백엔드를 실행한 다음, 터널을 백엔드 포트로 연결한다.
+
+예시 명령:
+```bash
+cloudflared tunnel --url http://127.0.0.1:8000
+```
+
+- 출력된 `trycloudflare.com` 주소를 GitHub Pages 쪽 `BACKEND_API_BASE_URL`로 넣는다.
+- `backend/cloudflared/config.example.yml`은 named tunnel로 확장할 때 참고용이다.
+- `backend/scripts/install-cloudflared.ps1`를 실행하면 repo 안의 `.tools/cloudflared.exe`로 내려받을 수 있다.
+
+### 1.4 GitHub Pages 연동 값
+- GitHub 저장소 Settings > Secrets and variables > Actions 에서 `BACKEND_API_BASE_URL` 변수를 만든다.
+- 값에는 Cloudflare Tunnel이 발급한 공개 URL을 넣는다.
+- GitHub Pages 워크플로가 이 값을 `frontend/index.html`의 `api-base` 메타 태그에 주입한다.
+
 ## 2. 사용 방법
 
 ### 2.1 매매일지 입력
@@ -68,6 +86,11 @@ start http://127.0.0.1:8000
 - 증상: `uv sync` 또는 `uv run`이 PyPI에 접근하지 못함
 - 원인: 네트워크 차단 또는 프록시 정책
 - 대응: 네트워크 허용 후 다시 실행하거나, 기존 `.venv`가 있으면 재사용한다.
+
+### 3.6 Cloudflare Tunnel 미설치
+- 증상: `cloudflared` 명령이 없다고 나옴
+- 원인: 바이너리가 설치되지 않음
+- 대응: `cloudflared`를 설치한 뒤 다시 실행한다.
 
 ## 4. 운영 체크리스트
 - 스케줄러가 활성화되어 있는지 확인

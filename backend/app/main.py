@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.health import router as health_router
@@ -17,6 +16,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
+        allow_origin_regex=settings.cors_origin_regex,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -32,11 +32,7 @@ def create_app() -> FastAPI:
         init_db()
 
     if settings.frontend_dir.exists():
-        app.mount("/assets", StaticFiles(directory=settings.frontend_dir), name="assets")
-
-        @app.get("/", include_in_schema=False)
-        def index() -> FileResponse:
-            return FileResponse(settings.frontend_dir / "index.html")
+        app.mount("/", StaticFiles(directory=settings.frontend_dir, html=True), name="frontend")
 
     return app
 

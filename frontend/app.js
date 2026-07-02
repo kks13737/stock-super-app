@@ -17,9 +17,19 @@ const endpoints = {
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+const API_BASE_URL =
+  document.querySelector('meta[name="api-base"]')?.content?.trim() ||
+  window.__API_BASE_URL__ ||
+  "";
+const IS_GITHUB_PAGES = window.location.hostname.endsWith("github.io");
 
 async function request(path, options = {}) {
-  const response = await fetch(path, {
+  if (IS_GITHUB_PAGES && !API_BASE_URL) {
+    throw new Error("GitHub Pages 배포에서는 백엔드 API가 연결되지 않았습니다.");
+  }
+
+  const url = API_BASE_URL ? `${API_BASE_URL}${path}` : path;
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
@@ -28,7 +38,14 @@ async function request(path, options = {}) {
   });
 
   const text = await response.text();
-  const payload = text ? JSON.parse(text) : {};
+  let payload = {};
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = { message: text };
+    }
+  }
 
   if (!response.ok) {
     throw new Error(payload.detail || payload.message || `HTTP ${response.status}`);

@@ -19,6 +19,7 @@ class Settings:
     api_port: int = int(os.getenv("API_PORT", "8000"))
     database_path: Path = field(init=False)
     cors_origins: list[str] = field(init=False)
+    cors_origin_regex: str = os.getenv("CORS_ORIGIN_REGEX", r"https://.*\.github\.io")
     naver_news_url: str = os.getenv(
         "NAVER_NEWS_URL",
         "https://finance.naver.com/news/news_list.naver?mode=LSS2D&section_id=101&section_id2=258",
