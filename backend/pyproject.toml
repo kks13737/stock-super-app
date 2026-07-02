@@ -1,0 +1,12 @@
+[project]
+name = "stock-super-app-backend"
+version = "0.1.0"
+description = "Stock super app backend"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn[standard]>=0.30.0",
+  "beautifulsoup4>=4.12.3",
+  "requests>=2.32.3",
+]
+

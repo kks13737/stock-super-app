@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나만의 주식관리 슈퍼앱 문서 요약</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-2: #34d399;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(52, 211, 153, 0.14), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+    header {
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(17,24,39,0.95), rgba(17,24,39,0.8));
+      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .card {
+      background: rgba(31, 41, 55, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.2rem;
+      color: #f8fafc;
+    }
+    .pill {
+      display: inline-block;
+      margin: 0 8px 8px 0;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      color: #bae6fd;
+      font-size: 0.88rem;
+    }
+    .pill.green {
+      background: rgba(52, 211, 153, 0.12);
+      color: #bbf7d0;
+    }
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    li { margin-bottom: 8px; }
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .links a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    code {
+      background: rgba(255,255,255,0.08);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>나만의 주식관리 슈퍼앱 문서 요약</h1>
+      <p class="subtitle">매매일지, 뉴스 수집, 공포탐욕지수를 하나의 대시보드에서 관리하는 개인용 투자 보조 앱</p>
+      <div style="margin-top:16px;">
+        <span class="pill">Python FastAPI + uv</span>
+        <span class="pill green">정적 HTML/CSS/JS FE</span>
+        <span class="pill green">SQLite DB</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>PRD 핵심</h2>
+        <ul>
+          <li>날짜별 주식 매매일지 캘린더</li>
+          <li>네이버 증권 뉴스 자동/수동 수집</li>
+          <li>CNN 공포탐욕지수 자동/수동 수집</li>
+          <li>중복 저장 방지 및 실패 로그</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>아키텍처 핵심</h2>
+        <ul>
+          <li>API, Service, Crawler, Scheduler 분리</li>
+          <li>수집 로직은 BS4 전용 모듈에서 처리</li>
+          <li>DB는 매매일지, 기사, 지수, 작업 로그 저장</li>
+          <li>모든 시간 기준은 KST로 통일</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>운영 핵심</h2>
+        <ul>
+          <li>자동 수집과 수동 수집이 동일 로직을 사용</li>
+          <li>HTML 구조 변경 시 파서 모듈만 우선 수정</li>
+          <li>수집 실패는 로그와 재시도로 대응</li>
+          <li>시간대 오류는 서버 KST 설정으로 방지</li>
+        </ul>
+      </section>
+
+      <section class="card links">
+        <h2>문서 링크</h2>
+        <ul>
+          <li><a href="./PRD.md">PRD.md</a></li>
+          <li><a href="./Architecture.md">Architecture.md</a></li>
+          <li><a href="./Operation.md">Operation.md</a></li>
+        </ul>
+      </section>
+    </div>
+
+    <p class="footer">실행 관점에서는 백엔드 수집 스케줄과 프론트엔드 캘린더 화면이 핵심이며, 문서는 이 흐름을 기준으로 정리되어 있다.</p>
+  </div>
+</body>
+</html>

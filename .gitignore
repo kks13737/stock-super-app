@@ -1,0 +1,15 @@
+.codex/
+.agents/
+.venv/
+.uv-cache/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+backend/.venv/
+backend/.uv-cache/
+backend/data/
+frontend/node_modules/
+frontend/dist/
+.idea/
+.vscode/

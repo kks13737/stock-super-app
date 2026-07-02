@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주식관리 슈퍼앱</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SA</div>
+        <div>
+          <h1>주식관리 슈퍼앱</h1>
+          <p>매매일지, 뉴스, 공포탐욕지수</p>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="메인 메뉴">
+        <button class="nav-item active" data-page="dashboard">대시보드</button>
+        <button class="nav-item" data-page="trade-journal">매매일지</button>
+        <button class="nav-item" data-page="news">뉴스 수집</button>
+        <button class="nav-item" data-page="fear-greed">공포탐욕지수</button>
+        <button class="nav-item" data-page="integration">연동 확인</button>
+      </nav>
+
+      <section class="status-panel">
+        <h2>연동 상태</h2>
+        <div id="health-status" class="status-list">
+          <div class="status-pill neutral">확인 중...</div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Personal Stock Super App</p>
+          <h2>주식 매매 기록과 시장 지표를 한 화면에서 관리</h2>
+          <p class="hero-copy">FastAPI + SQLite 백엔드와 순수 HTML, CSS, JS 프론트엔드로 구성된 실습용 앱입니다.</p>
+        </div>
+        <div class="hero-card">
+          <span class="hero-label">실행 모드</span>
+          <strong>Backend served static frontend</strong>
+          <span>FE-BE-DB 연결 확인 포함</span>
+        </div>
+      </header>
+
+      <section id="dashboard" class="page is-active">
+        <div class="page-head">
+          <h3>대시보드</h3>
+          <p>오늘의 수집 상태와 최신 데이터를 요약합니다.</p>
+        </div>
+
+        <div class="grid cards-3">
+          <article class="card highlight">
+            <span class="card-label">매매일지</span>
+            <strong>캘린더 중심 기록</strong>
+            <p>날짜별 종목 매매 기록을 입력하고 조회합니다.</p>
+          </article>
+          <article class="card highlight">
+            <span class="card-label">뉴스 수집</span>
+            <strong>네이버 증권 뉴스</strong>
+            <p>자동 수집과 수동 수집을 같은 경로로 처리합니다.</p>
+          </article>
+          <article class="card highlight">
+            <span class="card-label">공포탐욕지수</span>
+            <strong>CNN Fear & Greed</strong>
+            <p>6시간마다 최신 지수를 저장하고 보여줍니다.</p>
+          </article>
+        </div>
+
+        <div class="grid cards-2">
+          <article class="card">
+            <div class="section-toolbar">
+              <h4>최근 뉴스</h4>
+              <button id="refresh-news-mini" class="ghost-btn" type="button">새로고침</button>
+            </div>
+            <div id="news-mini-list" class="list"></div>
+          </article>
+          <article class="card">
+            <div class="section-toolbar">
+              <h4>공포탐욕지수 최신값</h4>
+              <button id="refresh-fg-mini" class="ghost-btn" type="button">새로고침</button>
+            </div>
+            <div id="fear-greed-mini" class="metric"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="trade-journal" class="page">
+        <div class="page-head">
+          <h3>매매일지</h3>
+          <p>날짜별 종목 매매 기록을 추가, 조회, 삭제합니다.</p>
+        </div>
+
+        <div class="grid cards-2">
+          <form id="trade-form" class="card form-card">
+            <div class="section-toolbar">
+              <h4>기록 추가</h4>
+              <button id="reset-trade" class="ghost-btn" type="button">초기화</button>
+            </div>
+
+            <input type="hidden" id="trade-id" />
+            <label>
+              <span>매매일</span>
+              <input id="trade-date" type="date" required />
+            </label>
+            <label>
+              <span>종목코드</span>
+              <input id="trade-ticker" type="text" placeholder="AAPL" required />
+            </label>
+            <label>
+              <span>종목명</span>
+              <input id="trade-stock-name" type="text" placeholder="Apple" required />
+            </label>
+            <label>
+              <span>구분</span>
+              <select id="trade-side" required>
+                <option value="buy">buy</option>
+                <option value="sell">sell</option>
+                <option value="hold">hold</option>
+              </select>
+            </label>
+            <label>
+              <span>수량</span>
+              <input id="trade-quantity" type="number" step="0.01" min="0" required />
+            </label>
+            <label>
+              <span>가격</span>
+              <input id="trade-price" type="number" step="0.01" min="0" required />
+            </label>
+            <label>
+              <span>메모</span>
+              <textarea id="trade-memo" rows="3" placeholder="매매 이유, 체크 포인트 등"></textarea>
+            </label>
+
+            <button class="primary-btn" type="submit">저장</button>
+            <p id="trade-form-message" class="form-message"></p>
+          </form>
+
+          <div class="card">
+            <div class="section-toolbar">
+              <h4>기록 목록</h4>
+              <div class="inline-controls">
+                <input id="trade-filter-date" type="date" />
+                <button id="trade-filter-btn" class="ghost-btn" type="button">조회</button>
+              </div>
+            </div>
+            <div id="trade-list" class="table-wrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="news" class="page">
+        <div class="page-head">
+          <h3>뉴스 수집</h3>
+          <p>네이버 증권 뉴스를 자동/수동으로 수집합니다.</p>
+        </div>
+        <div class="card">
+          <div class="section-toolbar">
+            <div>
+              <h4>수집 컨트롤</h4>
+              <p>매일 9시(KST) 자동 수집, 버튼으로 수동 수집 가능.</p>
+            </div>
+            <div class="inline-controls">
+              <button id="news-sync-btn" class="primary-btn" type="button">수동 수집</button>
+              <button id="news-refresh-btn" class="ghost-btn" type="button">목록 새로고침</button>
+            </div>
+          </div>
+          <p id="news-message" class="form-message"></p>
+          <div id="news-list" class="list large"></div>
+        </div>
+      </section>
+
+      <section id="fear-greed" class="page">
+        <div class="page-head">
+          <h3>공포탐욕지수</h3>
+          <p>CNN Fear & Greed Index를 6시간마다 수집합니다.</p>
+        </div>
+        <div class="card">
+          <div class="section-toolbar">
+            <div>
+              <h4>수집 컨트롤</h4>
+              <p>실패 시 로그를 남기고, 수동 버튼으로 즉시 재수집합니다.</p>
+            </div>
+            <div class="inline-controls">
+              <button id="fg-sync-btn" class="primary-btn" type="button">수동 수집</button>
+              <button id="fg-refresh-btn" class="ghost-btn" type="button">목록 새로고침</button>
+            </div>
+          </div>
+          <p id="fg-message" class="form-message"></p>
+          <div id="fear-greed-list" class="list large"></div>
+        </div>
+      </section>
+
+      <section id="integration" class="page">
+        <div class="page-head">
+          <h3>연동 확인</h3>
+          <p>FE-BE와 BE-DB 상태를 한 번에 확인합니다.</p>
+        </div>
+        <div class="grid cards-2">
+          <article class="card">
+            <h4>백엔드 상태</h4>
+            <pre id="health-json" class="code-block">{}</pre>
+          </article>
+          <article class="card">
+            <h4>실행 메모</h4>
+            <ul class="bullet-list">
+              <li>프론트는 백엔드가 제공하는 정적 HTML로 서빙됩니다.</li>
+              <li>API 호출은 모두 `/api/*` 경로를 사용합니다.</li>
+              <li>DB는 SQLite 파일 기반입니다.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
