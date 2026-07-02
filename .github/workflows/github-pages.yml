@@ -34,11 +34,6 @@ jobs:
           BACKEND_API_BASE_URL: ${{ vars.BACKEND_API_BASE_URL }}
         run: |
           set -euo pipefail
-          if [ -z "${BACKEND_API_BASE_URL:-}" ]; then
-            echo "BACKEND_API_BASE_URL GitHub Actions variable is required for GitHub Pages deployment."
-            exit 1
-          fi
-
           rm -rf dist-pages
           mkdir -p dist-pages
           cp frontend/index.html dist-pages/index.html
@@ -50,9 +45,6 @@ jobs:
           from html import escape
 
           backend_url = os.environ.get("BACKEND_API_BASE_URL", "").strip()
-          if not backend_url:
-              raise SystemExit("BACKEND_API_BASE_URL is required")
-
           index_path = Path("dist-pages/index.html")
           content = index_path.read_text(encoding="utf-8")
           replacement = f'<meta name="api-base" content="{escape(backend_url, quote=True)}" />'

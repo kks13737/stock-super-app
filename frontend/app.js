@@ -270,21 +270,43 @@ async function loadHealth() {
 async function loadTradeJournals() {
   const filterDate = $("#trade-filter-date").value;
   const query = filterDate ? `?trade_date=${encodeURIComponent(filterDate)}` : "";
-  const data = await request(`${endpoints.tradeJournals}${query}`);
-  state.tradeJournals = data.items || [];
+  try {
+    const data = await request(`${endpoints.tradeJournals}${query}`);
+    state.tradeJournals = data.items || [];
+  } catch (error) {
+    state.tradeJournals = [];
+    $("#trade-list").innerHTML = `<div class="list-item muted">${escapeHtml(error.message)}</div>`;
+    return;
+  }
   renderTradeList();
 }
 
 async function loadNews() {
-  const data = await request(endpoints.news);
-  state.news = data.items || [];
+  try {
+    const data = await request(endpoints.news);
+    state.news = data.items || [];
+  } catch (error) {
+    state.news = [];
+    $("#news-message").textContent = error.message;
+    renderNewsMini();
+    renderNewsList();
+    return;
+  }
   renderNewsMini();
   renderNewsList();
 }
 
 async function loadFearGreed() {
-  const data = await request(endpoints.fearGreed);
-  state.fearGreed = data.items || [];
+  try {
+    const data = await request(endpoints.fearGreed);
+    state.fearGreed = data.items || [];
+  } catch (error) {
+    state.fearGreed = [];
+    $("#fg-message").textContent = error.message;
+    renderFearGreedMini();
+    renderFearGreedList();
+    return;
+  }
   renderFearGreedMini();
   renderFearGreedList();
 }
